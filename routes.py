@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 
 from extensions import db
 from models import Image
+from image_process import to_greyscale
 
 upload_bp = Blueprint("upload", __name__)
 
@@ -19,6 +20,7 @@ def upload_image():
         return jsonify({"error": "no image file provided"}), 400
 
     file = request.files["image"]
+    operation = request.form.get("process")
 
     if file.filename == "":
         return jsonify({"error": "no selected file"}), 400
@@ -51,10 +53,17 @@ def upload_image():
     db.session.add(img)
     db.session.commit()
 
+    if operation == "gray":
+        output_image = to_greyscale(filepath)
+    else:
+        pass
+
+
     return jsonify({
         "message": " uploaded ",
         "id": img.id,
         "filename": img.filename,
         "path": img.path,
-        "size": img.size
-    }), 201
+        "size": img.size,
+        "output": output_image
+    }), 201 
