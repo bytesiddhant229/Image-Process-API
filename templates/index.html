@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Processing API</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .app {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 15px;
+    }
+
+    input[type="file"] {
+      margin-bottom: 10px;
+    }
+
+    img {
+      max-width: 100%;
+      border: 1px solid #ddd;
+      margin: 10px 0;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    button.secondary {
+      background: #28a745;
+    }
+
+    button.secondary:hover {
+      background: #1e7e34;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h2>Image Processing API</h2>
+
+    <input type="file" id="upload" accept="image/*" />
+    <br>
+
+    <img id="preview" alt="Preview will appear here" />
+
+    <div class="buttons">
+      <button onclick="processImage('gray')">Grayscale</button>
+      <button class="secondary" onclick="processImage('blur')">Gaussian Blur</button>
+    </div>
+  </div>
+
+  <script>
+  const upload = document.getElementById("upload");
+  const preview = document.getElementById("preview");
+
+  upload.addEventListener("change", () => {
+    const file = upload.files[0];
+    if (!file) return;
+    preview.src = URL.createObjectURL(file);
+  });
+
+  async function processImage(type) {
+    const file = upload.files[0];
+    if (!file) {
+      alert("Please select an image first!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("operation", type);
+
+    const response = await fetch("/upload", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      alert("Error processing image: " + text);
+      return;
+    }
+
+    const data = await response.json();  
+
+    preview.src = data.output;        
+  }
+
+
+</script>
+
+</body>
+</html>

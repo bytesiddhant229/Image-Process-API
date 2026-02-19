@@ -1,6 +1,6 @@
 import os
 import uuid
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 
 from extensions import db
@@ -20,7 +20,7 @@ def upload_image():
         return jsonify({"error": "no image file provided"}), 400
 
     file = request.files["image"]
-    operation = request.form.get("process")
+    operation = request.form.get("operation")
 
     if file.filename == "":
         return jsonify({"error": "no selected file"}), 400
@@ -64,3 +64,9 @@ def upload_image():
         "size": img.size,
         "output": output_image
     }), 201 
+
+@upload_bp.route("/media/output/<filename>")
+def serve_output(filename):
+    output_folder = current_app.config["OUTPUT_FOLDER"]
+    return send_from_directory(output_folder, filename)
+

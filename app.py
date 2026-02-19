@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask , render_template
 from config import Config
 from extensions import db
 
@@ -17,8 +17,8 @@ def create_app():
         db.create_all()
 
     @app.route("/")
-    def home():
-        return "Welcome to Image Process API"
+    def index():
+        return render_template("index.html")
 
     return app
 
