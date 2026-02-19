@@ -1,11 +1,27 @@
 from flask import Flask
+from config import Config
+from extensions import db
 
-app = Flask(__name__)
+from routes import upload_bp
+from models import Image  
 
-@app.route("/")
-def home():
-    return "Welcome to Image Process API"
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-if __name__=="__main__":
+    db.init_app(app)
+
+    app.register_blueprint(upload_bp)
+
+    with app.app_context():
+        db.create_all()
+
+    @app.route("/")
+    def home():
+        return "Welcome to Image Process API"
+
+    return app
+
+if __name__ == "__main__":
+    app = create_app()
     app.run(debug=True)
-
